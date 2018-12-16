@@ -304,8 +304,6 @@ create_api() {
         echo -ne "\n"
         return
     fi
-    echo "Waiting for publishing tasks to complete"
-    sleep 60
     if [ ! -z "$out_sequence" ]; then
         echo "Adding mediation policy to $api_name API"
         local sequence_id=$($curl_command -H "Authorization: Bearer $create_access_token" -H "Content-Type: application/json" -d "$(mediation_policy_request "$out_sequence")" "${base_https_url}/api/am/publisher/v0.14/apis/${api_id}/policies/mediation" | jq -r '.id')
@@ -317,22 +315,27 @@ create_api() {
             echo -ne "\n"
             return
         fi
-        sleep 60
+
         #Get API
         local api_details=$($curl_command -H "Authorization: Bearer $view_access_token" "${base_https_url}/api/am/publisher/v0.14/apis/${api_id}")
         #Update API with sequence
-        echo "Updating $api_name API to set mediation policy"
+        echo "Updating $api_name API to set mediation policy..."
         api_details=$(echo $api_details | jq -r '.sequences |= [{"name":"mediation-api-sequence","type":"out"}]')
-        local updated_api_id=$($curl_command -H "Authorization: Bearer $create_access_token" -H "Content-Type: application/json" -X PUT -d "$api_details" "${base_https_url}/api/am/publisher/v0.14/apis/${api_id}" | jq -r '.id')
+
+        n=0
+        until [ $n -ge 20 ]; do
+            updated_api_id=$($curl_command -H "Authorization: Bearer $create_access_token" -H "Content-Type: application/json" -X PUT -d "$api_details" "${base_https_url}/api/am/publisher/v0.14/apis/${api_id}" | jq -r '.id')
         if [ ! -z $updated_api_id ] && [ ! $updated_api_id = "null" ]; then
             echo "Mediation policy is set to $api_name API with ID $updated_api_id"
-            echo -ne "\n"
-        else
+                break
+            fi
+            n=$(($n + 1))
+            sleep 5
+        done
+        if [ -z $updated_api_id ] || [ $updated_api_id = "null" ]; then
             echo "Failed to set mediation policy to $api_name API"
-            echo -ne "\n"
-            return
+             exit 1
         fi
-        sleep 30
     fi
     echo "Subscribing $api_name API to DefaultApplication"
     local subscription_id=$($curl_command -H "Authorization: Bearer $subscribe_access_token" -H "Content-Type: application/json" -d "$(subscription_request $api_id)" "${base_https_url}/api/am/store/v0.14/subscriptions" | jq -r '.subscriptionId')
