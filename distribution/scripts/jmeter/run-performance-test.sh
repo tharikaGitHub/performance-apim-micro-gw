@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 # ----------------------------------------------------------------------------
-# RUN Performance TEST
+# Run Performance Tests for WSO2 API Manager
 # ----------------------------------------------------------------------------
 
 # This script will initiate all the Test scenarios

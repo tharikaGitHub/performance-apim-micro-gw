@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class JWTGenerator {
     public static final String KEY_TYPE_PRODUCTION = "PRODUCTION";
+    public static final String WSO2CARBON = "wso2carbon";
     public static final int VALIDITY_PERIOD = 3600 * 24 * 365;
 
     public static void main(String[] args) throws Exception {
@@ -105,14 +106,11 @@ public class JWTGenerator {
         String base64UrlEncodedBody = Base64.getUrlEncoder().encodeToString(payload.getBytes(Charset.defaultCharset()));
 
         Signature signature = Signature.getInstance("SHA256withRSA");
-        //        String jksPath = JWTGenerator.class.getClassLoader().getResource("wso2carbon.jks").getPath();
-        //        System.out.println(jksPath);
         FileInputStream is = new FileInputStream(new File("wso2carbon.jks"));
-        //        FileInputStream is = new FileInputStream(jksPath);
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keystore.load(is, "wso2carbon".toCharArray());
-        String alias = "wso2carbon";
-        Key key = keystore.getKey(alias, "wso2carbon".toCharArray());
+        keystore.load(is, WSO2CARBON.toCharArray());
+        String alias = WSO2CARBON;
+        Key key = keystore.getKey(alias, WSO2CARBON.toCharArray());
         Key privateKey = null;
         if (key instanceof PrivateKey) {
             privateKey = key;

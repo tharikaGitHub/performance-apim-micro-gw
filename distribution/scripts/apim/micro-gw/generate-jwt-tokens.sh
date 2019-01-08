@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2017 WSO2 Inc. (http://wso2.org)
+# Copyright 2019 WSO2 Inc. (http://wso2.org)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 # ----------------------------------------------------------------------------
-# Start WSO2 API Manager
+# Generate JWT Tokens
 # ----------------------------------------------------------------------------
 
 script_dir=$(dirname "$0")
@@ -36,11 +36,11 @@ if [[ -f $tokens_file ]]; then
     mv $tokens_file /tmp
 fi
 
-echo "Genearating Tokens.........."
+echo "Generating Tokens.........."
 
 for (( c=1; c <= $tokens_count; c++ ))
 do
-	JWT_TOKEN=$(java -jar org.wso2.am.microgw.jwt-generator-1.0.0-jar-with-dependencies.jar "echo" "/echo" "1.0.0" "DefaultApplication" "Unlimited" "Unlimited" 1)
+	JWT_TOKEN=$(java -jar /home/ubuntu/jwt-generator/org.wso2.am.microgw.jwt-generator-1.0.0-jar-with-dependencies.jar "echo" "/echo" "1.0.0" "DefaultApplication" "Unlimited" "Unlimited" 1)
     echo $JWT_TOKEN >> $tokens_file
     echo -ne "Generated Tokens Count: ${c}\r"
 done

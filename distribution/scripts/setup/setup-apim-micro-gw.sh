@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright 2017 WSO2 Inc. (http://wso2.org)
+# Copyright 2019 WSO2 Inc. (http://wso2.org)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 # limitations under the License.
 #
 # ----------------------------------------------------------------------------
-# Setup WSO2 API Manager
+# Setup WSO2 API Manager With Micro Gateway
 # ----------------------------------------------------------------------------
 
-# This script will run all other scripts to configure and setup WSO2 API Manager
+# This script will run all other scripts to configure and setup WSO2 API Manager with Micro Gateway
 
 # Make sure the script is running as root.
 if [ "$UID" -ne "0" ]; then
@@ -35,20 +35,20 @@ export micro_gw_dist=""
 export os_user=""
 
 function usageCommand() {
-    echo "-j <oracle_jdk_dist> -a <apim_product>  -g <micro-gw> -n <netty_host> -o <os_user>"
+    echo "-j <oracle_jdk_dist> -a <apim_product> -m <micro-gw> -n <netty_host> -u <os_user>"
 }
 export -f usageCommand
 
 function usageHelp() {
     echo "-j: Oracle JDK distribution."
     echo "-a: WSO2 API Manager distribution."
-    echo "-g: WSO2 API Manager Micro-GW Distribution."
+    echo "-m: WSO2 API Manager Micro-GW Distribution."
     echo "-n: The hostname of Netty service."
-    echo "-o: General user of the OS."
+    echo "-u: General user of the OS."
 }
 export -f usageHelp
 
-while getopts "gp:w:o:hj:a:m:n:o:" opt; do
+while getopts "gp:w:o:hj:a:m:n:u:" opt; do
     case "${opt}" in
     j)
         oracle_jdk_dist=${OPTARG}
@@ -62,7 +62,7 @@ while getopts "gp:w:o:hj:a:m:n:o:" opt; do
     n)
         netty_host=${OPTARG}
         ;;
-    o)
+    u)
         os_user=${OPTARG}
         ;;
     *)
@@ -123,28 +123,28 @@ function setup() {
 
     #Extract the Micro-gw zip
     echo "Extracting WSO2 API Manager Micro Gateway"
-    sudo -u $os_user unzip -q -o micro-gw.zip
+    sudo -u $os_user unzip -q -o $micro_gw_dist
     sudo -u $os_user mv wso2am-micro* micro-gw
     echo "Micro Gateway is extracted"
 
     #Export the PATH of Micro-GW
-    export PATH=$PATH:/home/ubuntu/micro-gw/bin
-    #source ~/.profile
+    export PATH=$PATH:/home/$os_user/micro-gw/bin
+    source ~/.profile
 
     # setup Micro-GW project
-    chmod +x /home/ubuntu/apim/micro-gw/create-micro-gw.sh
-    /home/ubuntu/apim/micro-gw/create-micro-gw.sh
+    chmod +x /home/$os_user/apim/micro-gw/create-micro-gw.sh
+    /home/$os_user/apim/micro-gw/create-micro-gw.sh
 
     #build Micro-GW
     micro-gw build echo-mgw
 
-    unzip /home/ubuntu/echo-mgw/target/micro-gw-echo-mgw.zip
-    chown -R ubuntu /home/ubuntu
+    unzip /home/$os_user/echo-mgw/target/micro-gw-echo-mgw.zip
+    chown -R $os_user /home/$os_user
 
     #start Micro-GW
-    sudo -u ubuntu /home/ubuntu/apim/micro-gw/micro-gw-start.sh 1G
+    sudo -u $os_user /home/$os_user/apim/micro-gw/micro-gw-start.sh 1G
 
-    sudo -u ubuntu /home/ubuntu/apim/micro-gw/generate-jwt-tokens.sh 1000
+    sudo -u $os_user /home/$os_user/apim/micro-gw/generate-jwt-tokens.sh 1000
 
     popd
     echo "Completed API Manager setup..."

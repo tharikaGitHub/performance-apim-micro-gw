@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2017 WSO2 Inc. (http://wso2.org)
+# Copyright 2019 WSO2 Inc. (http://wso2.org)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 # ----------------------------------------------------------------------------
-# RUN Performance TEST
+# Run Performance Tests for WSO2 API Manager Micro Gateway
 # ----------------------------------------------------------------------------
 
 # This script will initiate all the Test scenarios
